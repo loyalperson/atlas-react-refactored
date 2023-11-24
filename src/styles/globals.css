@@ -1,0 +1,79 @@
+@import 'https://js.arcgis.com/4.28/@arcgis/core/assets/esri/themes/light/main.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Figtree&display=swap');
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #aaa;
+}
+
+::-webkit-scrollbar-track:hover {
+  background-color: #f2f2f2;
+}
+
+::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+html {
+  background: #00211D;
+}
+
+@media (max-width: 720px) {
+  pre {
+    width: calc(100vw - 110px);
+  }
+}
+
+pre:has(div.codeblock) {
+  padding: 0;
+}
+
+#map-page-container,
+#map-page-container
+  *
+  :not(
+    [class^='esri-icon-'],
+    .esri-building-phase-picker__arrow-left,
+    .esri-building-phase-picker__arrow-right,
+    .esri-building-level-picker__arrow-up,
+    .esri-building-level-picker__arrow-down,
+    [class*='\ esri-icon-'],
+    .esri-building-phase-picker__arrow-left,
+    .esri-building-phase-picker__arrow-right,
+    .esri-building-level-picker__arrow-up,
+    .esri-building-level-picker__arrow-down
+  ) {
+  font-family: 'Figtree', sans-serif !important;
+}
+
+.esri-features__container {
+  padding: 0px;
+}
+
+#map-page-container * :not(header) {
+  border-radius: 10px;
+}
+
+#map-page-container textarea[placeholder='Type a message...'] {
+  height: 44px;
+}
+
+#map-page-container textarea[placeholder='Type a message...'] ~ button {
+  color: black;
+}
