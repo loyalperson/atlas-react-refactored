@@ -38,6 +38,7 @@
   },
   "devDependencies": {
     "@arcgis/core": "^4.28.9",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@dqbd/tiktoken": "^1.0.2",
     "@tabler/icons-react": "^2.9.0",
     "@testing-library/jest-dom": "^5.17.0",
