@@ -130,7 +130,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
       }`}
       style={{ overflowWrap: 'anywhere' }}
     >
-      <div className="relative m-auto flex p-4 text-base md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
+      <div className="relative m-auto flex p-4 text-base md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl" style={{paddingRight:'10px'}}>
         <div className="min-w-[40px] text-right font-bold">
           {message.role === 'assistant' ? (
             <img 
@@ -145,7 +145,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
 
         <div className="prose mt-[-2px] w-full dark:prose-invert">
           {message.role === 'user' ? (
-            <div className="flex w-full">
+            <div className="flex w-full" style={{paddingRight:'15px'}}>
               {isEditing ? (
                 <div className="flex w-full flex-col">
                   <textarea
@@ -209,7 +209,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
               )}
             </div>
           ) : (
-            <div className="flex flex-row">
+            <div className="flex flex-row"style={{paddingRight:'15px'}}>
               <MemoizedReactMarkdown
                 className="prose dark:prose-invert flex-1"
                 remarkPlugins={[remarkGfm, remarkMath]}

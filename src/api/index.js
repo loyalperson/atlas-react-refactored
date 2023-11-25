@@ -1,10 +1,9 @@
 import axios from 'axios';
 
-const API = axios.create({ baseURL: 'https://polydub-backend-7707d66a10f4.herokuapp.com/api', headers:{
+const API = axios.create({ baseURL: 'https://atlaspro-a6a906d6e540.herokuapp.com', headers:{
     'X-Requested-With': 'XMLHttpRequest'
     }
 });
 
-export const pointInfo = (content) => API.post(`/info`, content);
-export const getAnswer = (message) => API.post(`/ask`, message);
-// export const getProjects = (user_id) => API.get(`/users/${user_id}/projects`);
+export const getResponse = (data) => API.post(`/get_response`, data);
+// export const pointInfo = (content) => API.post(`/info`, content);

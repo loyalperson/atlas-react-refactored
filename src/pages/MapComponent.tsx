@@ -1,7 +1,8 @@
+import { useAuth0 } from "@auth0/auth0-react";
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
-
 import PopupInfo from '../components/PopupInfo';
 import PopupPortal from '../components/PopupPortal';
+import { getMapPointData } from '../actions/getMapPointDataAction';
 import '../styles/globals.css';
 import '../styles/custom.css';
 import axios from 'axios';
@@ -21,9 +22,21 @@ import { Sidebar } from 'primereact/sidebar';
 const popupRoot = document.createElement('div');
 
 export default function MapComponent() {
+  const { logout } = useAuth0();
+
+  const handleLogout = () => {
+    logout({
+      logoutParams: {
+        returnTo: 'https://www.atlaspro.ai',
+      },
+    });
+  };
+
   const mapDiv = useRef<HTMLDivElement>(null);
   const [popupData, setPopupData] = useState<AddressCandidate | null>(null);
   const [view, setView] = useState<any>(null);
+  // const [parcelData, setParcelData] = useState<any>(null);
+  // const [incomeData, setIncomeData] = useState<any>(null);
   const [selectedMap, setSelectedMap] = useState<string>('Satellite');
   const [addedLayer, setAddedLayer] = useState<FeatureLayer|MapImageLayer|null>(null);
   const [displayData, setDisplayData] = useState<any | null>(null);
@@ -72,14 +85,17 @@ export default function MapComponent() {
         if(mapType == "Parcel_View"){
           if (typeof window !== 'undefined') {
             localStorage.setItem('parcelData', JSON.stringify(attributes));
+            console.log('----->setParcelData', attributes)
           }
         }
         if(mapType == "Income_Boundaries"){
           if (typeof window !== 'undefined') {
             localStorage.setItem('incomeData', JSON.stringify(attributes));
+            console.log('----->setIncomeData', attributes)
           }
         }
       }
+      return attributes;
       console.log('------->parcel attributes',attributes); // Example: Display the attributes in the console
     }
   }
@@ -188,8 +204,8 @@ export default function MapComponent() {
               localStorage.setItem('Address', response.address);
             }
             
-            getSelectedData("Parcel_View", event.mapPoint, 2);
-            getSelectedData("Income_Boundaries", event.mapPoint, 2);
+            const parcelData = await getSelectedData("Parcel_View", event.mapPoint, 2);
+            const incomeData = await getSelectedData("Income_Boundaries", event.mapPoint, 2);
 
             console.log(
               '🚀 ~ file: MapComponent.tsx:240 ~ mapView.on ~ response:',
@@ -201,20 +217,21 @@ export default function MapComponent() {
                 getSelectedData(mapType,event.mapPoint,1);
               }
             }
-              
-            let convertedCoordinates = proj4(webMercator, decimalDegrees, [event.mapPoint.x, event.mapPoint.y]);
-            console.log('---->convertedCoordinates', convertedCoordinates);
-            const locationToElevation = await axios.post('https://api.open-elevation.com/api/v1/lookup', {"locations":[{"latitude": convertedCoordinates[1], "longitude":convertedCoordinates[0]}]});
-            console.log('---->locationToElevation', locationToElevation.data.results[0].elevation);
-            let elevationResult = locationToElevation.data.results[0].elevation;
-            if (typeof window !== 'undefined') {
-              localStorage.setItem('Elevation', JSON.stringify(locationToElevation.data.results[0]));
-            }
+            await getMapPointData({address:response.address, parcelData:parcelData, incomeData:incomeData, elevation:'10m'})
 
-            if(mapType == 'Elevation'){
-              setDisplayData({elevation:elevationResult});
-              setVisible(true);
-            }
+            // let convertedCoordinates = proj4(webMercator, decimalDegrees, [event.mapPoint.x, event.mapPoint.y]);
+            // console.log('---->convertedCoordinates', convertedCoordinates);
+            // const locationToElevation = await axios.post('https://api.open-elevation.com/api/v1/lookup', {"locations":[{"latitude": convertedCoordinates[1], "longitude":convertedCoordinates[0]}]});
+            // console.log('---->locationToElevation', locationToElevation.data.results[0].elevation);
+            // let elevationResult = locationToElevation.data.results[0].elevation;
+            // if (typeof window !== 'undefined') {
+            //   localStorage.setItem('Elevation', JSON.stringify(locationToElevation.data.results[0].elevation));
+            // }
+            // if(mapType == 'Elevation'){
+              //   setDisplayData({elevation:elevationResult});
+              //   setVisible(true);
+              // }
+            // await getMapPointData({address:response.address, parcelData:parcelData, incomeData:incomeData, elevation:`${elevationResult}m`})
             // showPopup(event.mapPoint, response.address, mapView);
             mapView.popup.open({
               title: response.address,
@@ -324,12 +341,12 @@ export default function MapComponent() {
           </a>
         </div>
         <div className="flex items-center">
-          <a
-            href="https://app.atlaspro.ai/api/auth/logout"
+          <button
             className="cursor-pointer select-none items-center gap-3 rounded-md p-3 text-white transition-colors duration-200 hover:text-white/30"
+            onClick={handleLogout}
           >
             Logout
-          </a>
+          </button>
         </div>
       </header>
       <div style={{marginTop:'10px',marginBottom:'-10px'}}>
@@ -349,7 +366,7 @@ export default function MapComponent() {
       <div
         ref={mapDiv}
         style={{
-          height: '90%',
+          height: '87%',
           width: '90%',
           margin: 'auto',
           paddingLeft: '150px',

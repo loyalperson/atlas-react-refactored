@@ -8,7 +8,7 @@ import {
   useState,
 } from 'react';
 import toast from 'react-hot-toast';
-
+import axios from 'axios';
 import '../../styles/globals.css';
 import '../../styles/custom.css';
 import { getEndpoint } from '../../utils/app/api';
@@ -53,6 +53,10 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [showScrollDownButton, setShowScrollDownButton] = useState<boolean>(false);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [typingIndicator, setTypingIndicator] = useState('Typing');
+  const [isTyping, setIsTyping] = useState(false);
+  const typingIndicators = ['Typing', 'Typing.', 'Typing..', 'Typing...'];
+  let typingInterval: NodeJS.Timeout | null = null;
 
   const toggleMinimize = () => {
     setIsMinimized(!isMinimized);
@@ -63,8 +67,26 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  useEffect(() => {
+    if (isTyping) {
+      typingInterval = setInterval(updateTypingIndicator, 500);
+    } else {
+      resetTypingIndicator();
+      if (typingInterval) {
+        clearInterval(typingInterval);
+      }
+    }
+  
+    return () => {
+      if (typingInterval) {
+        clearInterval(typingInterval);
+      }
+    };
+  }, [isTyping]);
+
   const handleSend = useCallback(
     async (message: Message, deleteCount = 0) => {
+      setIsTyping(true);
       console.log(
         '🚀 ~ file: Chat.tsx:73 ~ async(message:Message,deleteCount ~ message:',
         message,
@@ -96,104 +118,26 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         });
         homeDispatch({ field: 'loading', value: true });
         homeDispatch({ field: 'messageIsStreaming', value: true });
-        // const chatBody: ChatBody = {
-        //   model: updatedConversation.model,
-        //   messages: updatedConversation.messages,
-        //   key: apiKey,
-        //   prompt: updatedConversation.prompt,
-        //   temperature: updatedConversation.temperature,
-        // };
-        // const endpoint = getEndpoint();
-        // let body;
-        // const elevation = localStorage.getItem('Elevation') || '';
-        // const parcelData = localStorage.getItem('parcelData') || '';
-        // const incomeData = localStorage.getItem('incomeData') || '';
-        // const address = localStorage.getItem('Address') || '';
-
-        // body = JSON.stringify({chatBody, elevation, parcelData, incomeData, address});
-
-        // const controller = new AbortController();
-        // const response = await fetch(endpoint, {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //   },
-        //   signal: controller.signal,
-        //   body,
-        // });
-        // if (!response.ok) {
-        //   homeDispatch({ field: 'loading', value: false });
-        //   homeDispatch({ field: 'messageIsStreaming', value: false });
-        //   toast.error(response.statusText);
-        //   return;
-        // }
-        // const data = response.body;
-        // if (!data) {
+        
         homeDispatch({ field: 'loading', value: false });
         homeDispatch({ field: 'messageIsStreaming', value: false });
-        //   return;
-        // }
-        // if (updatedConversation.messages.length === 1) {
-        //   const { content } = message;
-        //   const customName =
-        //     content.length > 30 ? content.substring(0, 30) + '...' : content;
-        //   updatedConversation = {
-        //     ...updatedConversation,
-        //     name: customName,
-        //   };
-        // }
-        // homeDispatch({ field: 'loading', value: false });
-        // const reader = data.getReader();
-        // const decoder = new TextDecoder();
-        // let done = false;
-        // let isFirst = true;
-        // let text = '';
-        // while (!done) {
-        //   if (stopConversationRef.current === true) {
-        //     controller.abort();
-        //     done = true;
-        //     break;
-        //   }
-        //   const { value, done: doneReading } = await reader.read();
-        //   done = doneReading;
-        //   const chunkValue = decoder.decode(value);
-        //   text += chunkValue;
-        //   if (isFirst) {
-        //     isFirst = false;
-        //     const updatedMessages: Message[] = [
-        //       ...updatedConversation.messages,
-        //       { role: 'assistant', content: chunkValue },
-        //     ];
-        //     updatedConversation = {
-        //       ...updatedConversation,
-        //       messages: updatedMessages,
-        //     };
-        //     homeDispatch({
-        //       field: 'selectedConversation',
-        //       value: updatedConversation,
-        //     });
-        //   } else {
-        //     const updatedMessages: Message[] =
-        //       updatedConversation.messages.map((message, index) => {
-        //         if (index === updatedConversation.messages.length - 1) {
-        //           return {
-        //             ...message,
-        //             content: text,
-        //           };
-        //         }
-        //         return message;
-        //       });
-        //     updatedConversation = {
-        //       ...updatedConversation,
-        //       messages: updatedMessages,
-        //     };
-        //     homeDispatch({
-        //       field: 'selectedConversation',
-        //       value: updatedConversation,
-        //     });
-        //   }
-        // }
-        updatedConversation['messages'] = updatedConversation['messages'].concat([{role: 'assistant', content: 'hi'}]);
+
+        const endpoint = "https://atlaspro-a6a906d6e540.herokuapp.com/get_response";
+        let body: any;
+        const elevation = localStorage.getItem('Elevation') || '10m';
+        const parcelData = localStorage.getItem('parcelData') || '';
+        const incomeData = localStorage.getItem('incomeData') || '';
+        const address = localStorage.getItem('Address') || '';
+        body = {messages: [message.content], address:address, elevation: elevation, parcelData: JSON.parse(parcelData), incomeData: JSON.parse(incomeData)}
+        // body = {messages: updatedConversation.messages, address:address, elevation: elevation, parcelData: parcelData, incomeData: incomeData}
+        
+        console.log('----->parcelData', parcelData);
+        console.log('----->body', body);
+        const get_response = await axios.post(endpoint, body);
+        setIsTyping(false);
+        resetTypingIndicator();
+
+        updatedConversation['messages'] = updatedConversation['messages'].concat([{role: 'assistant', content: get_response.data}]);
 
         saveConversation(updatedConversation);
         const updatedConversations: Conversation[] = conversations.map(
@@ -219,6 +163,18 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       stopConversationRef,
     ],
   );
+
+  const updateTypingIndicator = () => {
+    setTypingIndicator((prevIndicator) => {
+      const currentIndex = typingIndicators.indexOf(prevIndicator);
+      const nextIndex = (currentIndex + 1) % typingIndicators.length;
+      return typingIndicators[nextIndex];
+    });
+  };
+
+  const resetTypingIndicator = () => {
+    setTypingIndicator('Typing');
+  };
 
   const scrollToBottom = useCallback(() => {
     if (autoScrollEnabled) {
@@ -325,6 +281,16 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
 
           {loading && <ChatLoader />}
 
+          {isTyping && 
+            <div style={{marginTop:'10px', display:'flex', color:'#e5e7eb'}}>
+                <img 
+                  src="https://www.dropbox.com/scl/fi/yh2sb21oqn3bj5f5t4teu/Screenshot_2023-11-11_at_7.47.34_PM-removebg-preview.png?rlkey=10djlurjsew8s9e11qfh8f2ft&raw=1" 
+                  alt="Robot Icon" 
+                  style={{marginLeft:'18px', width: 30, height: 30 }} // Set the size of the image
+                />
+                <p style={{marginLeft:'32px',marginTop:'7px', marginBottom:'-30px'}}>{typingIndicator}</p>
+              </div>
+            }
           <div
             className="h-[162px] bg-light-green dark:bg-light-green"
             ref={messagesEndRef}
