@@ -5,8 +5,9 @@ import './styles/custom.css';
 import MapComponent  from './pages/MapComponent';
 import CallbackComponent from './pages/CallbackComponent';
 import LoginPage from './pages/LoginPage';
+// import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
-import { Routes, Route } from 'react-router-dom';
+import {BrowserRouter as Router ,Routes, Route } from 'react-router-dom';
 
 function App() {
   useEffect(() => {
@@ -21,11 +22,13 @@ function App() {
   }
 
   return (
+    <Router>
       <Routes>
         <Route path="/" element={<ProtectedComponent/>} />
         <Route path="/callback" element={<CallbackComponent/>} />
         <Route path='/login' element={<LoginPage/>}/>
       </Routes>
+    </Router>
   );
 }
 

@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+// import ReactDOM from 'react-dom';
+
 import './styles/globals.css';
 import './styles/custom.css';
 import App from './App';
@@ -13,42 +15,58 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
-export const Auth0ProviderWithNavigate = ({ children }: any) => {
-  const navigate = useNavigate();
+// export const Auth0ProviderWithNavigate = ({ children }: any) => {
+//   const navigate = useNavigate();
 
-  const domain = 'atlaspro.us.auth0.com';
-  const clientId = 'gsr3SHFQkpxa42M9t3bthJv9gq45qQSD';
-  const redirectUri = window.location.origin + '/callback';
+//   const domain = 'atlaspro.us.auth0.com';
+//   const clientId = 'gsr3SHFQkpxa42M9t3bthJv9gq45qQSD';
+//   const redirectUri = window.location.origin + '/callback';
 
-  const onRedirectCallback = (appState: any) => {
-    navigate(appState?.returnTo || window.location.pathname);
-  };
+//   const onRedirectCallback = (appState: any) => {
+//     navigate(appState?.returnTo || window.location.pathname);
+//   };
 
-  if (!(domain && clientId && redirectUri)) {
-    return null;
-  }
+//   if (!(domain && clientId && redirectUri)) {
+//     return null;
+//   }
 
-  return (
-    <Auth0Provider
-      domain={domain}
-      clientId={clientId}
-      authorizationParams={{
-        redirect_uri: redirectUri,
-      }}
-      onRedirectCallback={onRedirectCallback}
-    >
-      {children}
-    </Auth0Provider>
-  );
-};
+//   return (
+//     <Auth0Provider
+//       domain={domain}
+//       clientId={clientId}
+//       authorizationParams={{
+//         redirect_uri: redirectUri,
+//       }}
+//       onRedirectCallback={onRedirectCallback}
+//     >
+//       {children}
+//     </Auth0Provider>
+//   );
+// };
+
+// root.render(
+//   <BrowserRouter>
+//     <Provider store={store}>
+//       <Auth0ProviderWithNavigate>
+//         <App />
+//       </Auth0ProviderWithNavigate>
+//     </Provider>
+//   </BrowserRouter>
+// );
+// 
 
 root.render(
-  <BrowserRouter>
-    <Provider store={store}>
-    <Auth0ProviderWithNavigate>
-        <App />
-      </Auth0ProviderWithNavigate>
-  </Provider>
-  </BrowserRouter>
+  <Provider store={store}>
+    <Auth0Provider
+      domain={'atlaspro.us.auth0.com'}
+      clientId={'gsr3SHFQkpxa42M9t3bthJv9gq45qQSD'}
+      authorizationParams={{
+        redirect_uri: window.location.origin + '/callback',
+      }}
+    //  redirectUri={window.location.origin + '/callback'}
+    >
+      <App />
+    </Auth0Provider>
+  </Provider>,
+  // document.getElementById('root'),
 );
-// 
