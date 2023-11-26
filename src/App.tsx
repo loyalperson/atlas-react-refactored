@@ -7,7 +7,7 @@ import CallbackComponent from './pages/CallbackComponent';
 import LoginPage from './pages/LoginPage';
 // import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
-import {BrowserRouter as Router ,Routes, Route } from 'react-router-dom';
+import {BrowserRouter as Router ,Switch, Route } from 'react-router-dom';
 
 function App() {
   useEffect(() => {
@@ -23,11 +23,11 @@ function App() {
 
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<ProtectedComponent/>} />
-        <Route path="/callback" element={<CallbackComponent/>} />
-        <Route path='/login' element={<LoginPage/>}/>
-      </Routes>
+      <Switch>
+        <Route path="/" component={ProtectedComponent} />
+        <Route path="/callback" component={CallbackComponent} />
+        <Route path='/login' component={LoginPage}/>
+      </Switch>
     </Router>
   );
 }

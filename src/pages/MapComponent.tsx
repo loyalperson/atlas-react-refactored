@@ -73,7 +73,12 @@ export default function MapComponent() {
     console.log('------->queryResult attributes',queryResult); // Example: Display the attributes in the console
 
     const features = queryResult.features;
-
+    if(mapType == "Parcel_View"){
+      localStorage.setItem('parcelData', JSON.stringify({}));
+    }
+    if(mapType == "Income_Boundaries"){
+      localStorage.setItem('incomeData', JSON.stringify({}));
+    }
     if (features.length > 0) {
       const firstFeature = features[0];
       const attributes = firstFeature.attributes;
@@ -219,19 +224,19 @@ export default function MapComponent() {
             }
             await getMapPointData({address:response.address, parcelData:parcelData, incomeData:incomeData, elevation:'10m'})
 
-            // let convertedCoordinates = proj4(webMercator, decimalDegrees, [event.mapPoint.x, event.mapPoint.y]);
-            // console.log('---->convertedCoordinates', convertedCoordinates);
-            // const locationToElevation = await axios.post('https://api.open-elevation.com/api/v1/lookup', {"locations":[{"latitude": convertedCoordinates[1], "longitude":convertedCoordinates[0]}]});
-            // console.log('---->locationToElevation', locationToElevation.data.results[0].elevation);
-            // let elevationResult = locationToElevation.data.results[0].elevation;
-            // if (typeof window !== 'undefined') {
-            //   localStorage.setItem('Elevation', JSON.stringify(locationToElevation.data.results[0].elevation));
-            // }
-            // if(mapType == 'Elevation'){
-              //   setDisplayData({elevation:elevationResult});
-              //   setVisible(true);
-              // }
-            // await getMapPointData({address:response.address, parcelData:parcelData, incomeData:incomeData, elevation:`${elevationResult}m`})
+            let convertedCoordinates = proj4(webMercator, decimalDegrees, [event.mapPoint.x, event.mapPoint.y]);
+            console.log('---->convertedCoordinates', convertedCoordinates);
+            const locationToElevation = await axios.post('https://api.open-elevation.com/api/v1/lookup', {"locations":[{"latitude": convertedCoordinates[1], "longitude":convertedCoordinates[0]}]});
+            console.log('---->locationToElevation', locationToElevation.data.results[0].elevation);
+            let elevationResult = locationToElevation.data.results[0].elevation;
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('Elevation', JSON.stringify(locationToElevation.data.results[0].elevation));
+            }
+            if(mapType == 'Elevation'){
+                setDisplayData({elevation:elevationResult});
+                setVisible(true);
+              }
+            await getMapPointData({address:response.address, parcelData:parcelData, incomeData:incomeData, elevation:`${elevationResult}m`})
             // showPopup(event.mapPoint, response.address, mapView);
             mapView.popup.open({
               title: response.address,

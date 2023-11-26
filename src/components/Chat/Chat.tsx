@@ -134,6 +134,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         console.log('----->parcelData', parcelData);
         console.log('----->body', body);
         const get_response = await axios.post(endpoint, body);
+        console.log('------response_data', get_response.data);
         setIsTyping(false);
         resetTypingIndicator();
 
